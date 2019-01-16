@@ -161,7 +161,7 @@ u
 search()
 ```
 
-Pripnimo data.frame `data` v ikalni seznam
+Pripnimo data.frame `data` v iskalni seznam
 
 ```{r}
 attach(data)
@@ -172,7 +172,7 @@ search()
 mesec
 ```
 
-Dodatek spremenljivke v data.frame innzdružitev dveh podatkovnih tabel.
+Dodatek spremenljivke v data.frame in združitev dveh podatkovnih tabel.
 
 
 ```{r}
