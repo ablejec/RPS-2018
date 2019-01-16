@@ -6,6 +6,7 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
+## parametri, ki veljajo za vse chunke
 knitr::opts_chunk$set(echo = TRUE,fig.width=10,fig.height=10)
 par(mar=c(4,4,2,1))
 ```
@@ -22,6 +23,28 @@ box("fig",col=i)
 ```
 
 ## Funkcija `approx`
+
+Slučajna števila s pomočjo inverzne porazdelitvene funkcije
+
+Generirajmo porazdelitev z neko empirično gostoto
+
+```{r}
+n <- 100
+u <- runif(n)^2
+u <- sort(u)
+hist(u)
+rug(u)
+```
+
+EMpirična porazdelitvena funkcija
+
+```{r}
+P <- (rank(u)-0.5)/n
+pD <- approxfun(u,P,yleft=min(u),yright=max(u))
+plot(u,pD(u),type="b")
+```
+
+
 
 ## Funkcija `optim`
 
@@ -50,13 +73,12 @@ y <- a + b * x + eps
 plot(x,y)
 X <- x
 Y <- y
-rm(x)
 ```
 
 Optimizacija
 
 ```{r}
-optim(par=c(0,1),sumsq,x=X,y=Y)
+optim(par=c(0,1),sumsq,x=x,y=y)
 lm(y~X)
 ```
 
