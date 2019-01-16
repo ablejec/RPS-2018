@@ -36,16 +36,48 @@ hist(u)
 rug(u)
 ```
 
+```{r}
+plot(u, (rank(u)-0.5)/n)
+```
+
+
+
 Empirična porazdelitvena funkcija
 
 ```{r}
 P <- (rank(u)-0.5)/n
+approx(u,P,0.5)
 pD <- approxfun(u,P,yleft=min(u),yright=max(u))
 plot(u,pD(u),type="b")
 ```
 
 ```{r}
-polt(u^2)
+plot(u^2)
+```
+
+```{r}
+m=median(u)
+pD(m)
+```
+
+Kvantili
+
+```{r}
+qD=approxfun(P,u,yleft=min(P),yright=max(P))
+qD(0.5)==median(u)
+abs(qD(0.5)-median(u))< 10^(-8)
+```
+
+Slučajna števila
+
+```{r}
+rD <- function(n=100)    qD(runif(n))
+rD(20)
+```
+
+```{r}
+x <- rD(200)
+plot(x,rank(x))
 ```
 
 
@@ -76,12 +108,39 @@ y <- a + b * x + eps
 plot(x,y)
 X <- x
 Y <- y
+abline(lm(y~x),col="red")
 ```
 
 Optimizacija
 
 ```{r}
 optim(par=c(0,1),sumsq,x=x,y=y)
-lm(y~X)
+lm( y ~ x)
+```
+
+Absolutni odkloni
+
+
+```{r}
+sumsqa <- function(par,x,y
+                  ){
+  a <- par[1]
+  b <- par[2]
+  yhat <- a+b*x
+  d2 <- sum(abs(y-yhat))
+  return(d2)
+}
+```
+
+```{r}
+pabs <- optim(par=c(0,1),sumsqa,x=x,y=y)
+pabs
+lm( y ~ x)
+```
+
+```{r}
+plot(x,y)
+abline(lm(y~x),col="red")
+abline(pabs$par,col="blue")
 ```
 
