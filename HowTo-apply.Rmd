@@ -1,0 +1,71 @@
+---
+title: "apply"
+author: "A Blejec"
+date: "09 januar 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Parametri
+
+```{r}
+mu <- 0
+sigma <- 1
+n <- 9 # veliksot vzorcev
+N <- 100 # vzorcev
+```
+
+```{r}
+X <- rnorm(n*N,mu,sigma)
+length(X)
+X <- matrix(X, N, n)
+dim(X)
+```
+
+Povprečja po vrsticah
+
+```{r}
+xbars <- apply(X, 1, mean)
+se <- apply(X, 1, sd)/sqrt(n)
+```
+
+```{r}
+apply(X, 2, FUN= function(x,A=0) {x-A}, A=100)
+```
+
+```{r}
+apply(X,1,FUN=function(x) {which(x==max(x))})
+X[1:4,]
+```
+
+Meje intervala zaupanja
+
+```{r}
+l <- xbars-1.96*se
+u <- xbars+1.96*se
+```
+
+```{r}
+apply(cbind(l,u),1, prod)
+```
+
+
+
+ALi interval vsebuje povpečje populacuje $\mu$?
+```{r}
+l*u
+l*u>0
+barva <- 1+(l*u>0)
+barva
+```
+
+
+```{r}
+plot(l,xlim=c(1,N),ylim=c(-3,3),type="n")
+abline(h=mu,col=4)
+segments(1:N, l, 1:N , u, col=barva)
+```
+

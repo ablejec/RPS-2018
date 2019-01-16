@@ -1,0 +1,237 @@
+---
+title: "Simulacija in interval zaupanja"
+author: "A Blejec"
+date: "22 november 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Funkcije
+
+Pripravimo funkciji za standardno napako in interval zaupanja
+
+### Standardna napaka
+
+```{r}
+se <- function(x, na.rm=FALSE){
+  if(na.rm) {x <- x[!is.na(x)]
+  warning("Odstranil bom podatke!!!")
+  }
+  n <- length(x)
+  se <- sd(x, na.rm=na.rm)/sqrt(n)
+  return(se)
+  
+  }
+```
+
+iZPIS FUNKCIJE
+```{r}
+se
+```
+
+
+Preizkus
+
+```{r}
+x <- c(1,2,5,6,NA)
+sd(x)
+sd(x,na.rm=TRUE)
+se(x)
+se(x,na.rm=TRUE)
+se(x,na.rm=TRUE)==sd(x,na.rm=TRUE)/sqrt(sum(!is.na(x)))
+```
+
+### Mala simulacija
+
+Izbira vzorca iz neke porazdelitve
+Normalna porazdelitev
+
+Gostota porazdelitve
+
+```{r}
+dx <- 0.05
+x <- seq(-4,4,dx)
+y <- dnorm(x)
+plot(x,y)
+plot(x,y,type="h")  # type je lahko tudi npr. l, b
+```
+
+Opomba: pazi pri seštevanju
+
+```{r}
+sum(y)
+sum(y)*dx
+```
+
+
+SLučajne vrednosti
+
+```{r}
+rnorm(9)
+```
+
+Postavitev "semena"
+
+```{r}
+set.seed(1234)
+rnorm(9)
+rnorm(9)
+set.seed(1234)
+rnorm(9)
+```
+
+```{r}
+n <- 1000
+h <- hist(rnorm(n))
+str(h)
+points(h$mids,h$counts,col="blue",pch=16)
+d <- diff(h$breaks)[1]
+lines(x,dnorm(x)*n*d, col="red", lwd=3)
+```
+
+```{r}
+hist(rnorm(1000)^2,main="hi kvadrat"
+     , breaks=c(0,2^(-2:5)),xlim=c(0,8))
+x <- seq(0,32,0.1)
+lines(x, dchisq(x,1),col="red",lwd=2)
+```
+
+Kvantili
+
+```{r}
+qnorm(c(0.025,0.5,0.975))
+pnorm(c(-1,1))
+diff(pnorm(c(-1,1)))
+```
+
+### Simulacija
+
+```{r}
+n <- 9
+N <- 10
+mu <- 0
+sigma <- 1
+```
+
+Za en vzorec
+
+```{r}
+mean( rnorm (n ,mean=mu, sd = sigma))
+```
+
+Ponovimo večkrat
+
+```{r}
+means <- replicate(N
+    , mean( rnorm (n ,mean=mu, sd = sigma))
+          )
+means
+```
+
+Z zanko for
+
+```{r}
+mean1 <- NULL
+for(i in 1:N){
+  mean1[i] <- mean( rnorm (n ,mean=mu, sd = sigma))
+}
+mean1
+```
+
+```{r}
+mean1 <- NULL
+for(i in 1:N){
+  mean1 <- c(mean1, mean( rnorm (n ,mean=mu, sd = sigma)))
+}
+mean1
+```
+
+```{r}
+mean1 <- numeric(N)
+for(i in 1:N){
+  mean1[i] <- mean( rnorm (n ,mean=mu, sd = sigma))
+}
+mean1
+```
+
+
+```{r}
+n <- 25
+N <- 2000
+mu <- 0
+sigma <- 1
+```
+Dejanska simulacija
+```{r}
+means <- replicate(N, 
+      mean( rnorm(n,mu,sigma)))
+hist(means,xlim=c(-3,3),freq=FALSE
+     ,col="lightblue"
+     ,main=paste("n =",n))
+```
+
+Opis vzorčne porazdelitve
+
+```{r}
+E <- mean( means)
+SE <- sd(means)
+```
+
+```{r}
+cat("Pričakovana vrednost", E
+    ,"\nStandardna napaka",SE,"\n")
+```
+
+Kot rezultat simulacije dobimo vzorčno porazdelitev s pričakovano vrednostjo `r round(E,4)` in standardno napako ocenen povprečja `r round(SE,4)`.
+To je v skladi s teoretično standarndo napako `r sigma/sqrt(n)` .
+
+## in tako naprej ...
+
+Intervali zaupanja
+
+```{r}
+u <- means+1.96*sigma/sqrt(n)
+l <- means-1.96*sigma/sqrt(n)
+
+```
+
+Slika
+
+```{r}
+plot(means,ylim=c(-3,3),type="n")
+ind <- l*u>mu
+
+segments(1:N,l,1:N,u, col=ind+1)
+abline(h=mu,col="green")
+```
+
+
+```{r}
+means <- sort(means)
+u <- means+1.96*sigma/sqrt(n)
+l <- means-1.96*sigma/sqrt(n)
+plot(means,ylim=c(-3,3),type="p")
+ind <- l*u>mu
+segments(1:N,l,1:N,u, col=ind+1)
+abline(h=mu,col="green")
+```
+
+```{r}
+simul <- function(n=9,N=100,stat=mean, distr=rnorm, ...){
+  est <- replicate(N,stat ( distr( n, ...)))
+  hist(est)
+}
+```
+
+```{r}
+simul()
+```
+
+```{r}
+simul(stat=mean,distr=runif,min=0,max=10)
+```
+
+

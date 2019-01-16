@@ -1,0 +1,313 @@
+---
+title: "Analiza podatkov"
+author: "A Blejec"
+date: "23 oktober 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Branje podatkov
+
+Pot do datoteke
+
+```{r}
+fpath <- "http://bit.ly/16oBVpR"
+```
+
+```{r}
+data <- read.table(file = fpath
+                   , sep="\t"
+                   , header=TRUE
+                   )
+names(data)
+```
+
+Izpis začetka tabele
+```{r}
+head(data)
+n <- dim(data)[1]
+n
+nrow(data)
+ncol(data)
+```
+Izpisovanje vrednosti
+```{r}
+cat(" Število enot:",n,"\n"
+    , "Število spremenljivk:", ncol(data))
+```
+
+V markdown lahko v besedilo vključim R vrednsti
+
+Število enot je `r n`, 
+število spremenljiv pa `r ncol(data)`.
+Dimenzija pa je `r dim(data)`.
+
+Izpišimo zadnjih 6 vrstic
+```{r}
+n <- nrow(data)
+data[ (n-(6-1)):n    ,  ]
+```
+
+Naredimo funkcijo
+
+```{r}
+my.tail <- function( x, m = 6){
+  n <- nrow(x)
+  print(x[ (n-(m-1)):n , ])
+}
+# preizkus
+my.tail(data)
+# 3 vrstice
+my.tail(data, 3)
+my.tail(data, 1)
+my.tail(data,0)  # ne dela !!!
+```
+
+
+Struktura podatkovne tabele (data frame)
+
+```{r}
+str(data)
+```
+Povzetek
+```{r}
+summary(data[, 1:6])
+```
+
+Filtriranje
+
+```{r}
+filter <- data$starost < 30
+filter
+which(!filter)
+head(data[filter,])
+data <- data[filter, ]
+```
+
+Spreminjanje vrednosti v vektorju
+
+```{r}
+data$mesec
+x <- data$mesec
+x
+```
+
+Na katerih mestih ima x vredost 3?
+
+```{r}
+filter <- x == 3
+filter
+head(filter)
+which(filter)
+x[filter]
+x[which(filter)]
+data[filter,]
+```
+Popravek podatka 
+```{r}
+(filter <- x==0)
+x[filter] <- NA
+x
+```
+Prazen prostor se pri branju spremeni v NA
+
+```{r}
+data$mati
+is.na(data$mati)
+```
+
+Funkcije `as.*`
+
+```{r}
+is.numeric(x)
+y <- as.factor(x)
+sum(x,na.rm=TRUE)
+as.character(x)
+```
+
+Vrnemo popravljen vektor v data
+
+```{r}
+data$mesec <- y # da bo faktor
+```
+
+```{r}
+summary(data[, 1:6])
+```
+
+Popravljanje po elementih
+
+```{r }
+u <- x
+u[u==7]<- 999
+u
+```
+
+```{r}
+u <- x
+n <- length(u)
+for ( i in 1:n){
+  if( !is.na(u[i])&&u[i]==7) u[i] <- 999
+}
+u
+```
+
+## Uredimo dostop do spremenljivk v data.frame
+
+```{r}
+search()
+```
+
+Pripnimo data.frame `data` v ikalni seznam
+
+```{r}
+attach(data)
+search()
+```
+
+```{r}
+mesec
+```
+
+Dodatek spremenljivke v data.frame innzdružitev dveh podatkovnih tabel.
+
+
+```{r}
+x <- data[1:5,1:6]
+x
+data.frame(x, leto=2017)
+y <- data[10:15,1:6]
+xx <- data.frame(x,leto=2017)
+xx
+yy <- data.frame(y,leto=2016)
+yy
+rbind(xx,yy)
+```
+
+## Malo risanja
+
+Tabela "sedenja"
+
+```{r}
+x <- c(3,6,3,1)
+x
+tbl <- matrix(x
+              , nrow=2
+              , ncol=2
+              , dimnames=list(
+                c("M","F"),
+                c("1.","2.")
+              )
+              )
+tbl
+```
+
+Narišimo
+
+```{r}
+plot(tbl)
+```
+To ni tisto, kar pričakujemo.
+
+```{r}
+barplot(tbl)
+barplot(tbl,beside = TRUE)
+```
+
+```{r}
+mosaicplot(tbl)
+mosaicplot(t(tbl))
+```
+
+## Opisne spremenljivke
+
+```{r}
+names(data)
+```
+Spol. Pripraviti moramo tabelo frekvenc/POGSTOSTI.
+```{r}
+tbl <- table(spol)
+barplot(tbl)
+```
+
+```{r}
+tbl <- table(lasje,oci)
+tbl
+plot(tbl,col=c("lightblue","brown"))
+```
+
+```{r}
+barplot(tbl,xlab="Barva oči"
+        , legend=c("Svetli lasje","Temni lasje")
+        , col=c("gold","brown"))
+```
+Legendo premaknite navzgor.
+
+## Testiranje odvisnosti
+
+```{r}
+chisq.test(tbl)
+```
+
+```{r}
+hi2 <- chisq.test(lasje,oci)
+hi2
+```
+Struktura rezultata
+
+```{r}
+str(hi2)
+```
+p vrednost
+
+```{r}
+hi2$p.value
+cat("P vrednost=", hi2$p.value)
+hi2$p.value < 0.05
+if(hi2$p.value < 0.05) cat("Spremenljivki ",
+                          hi2$data.name, 
+                          "sta povezani",
+                          "(p =", round(hi2$p.value,3),
+                          ")") else cat("nista povezani")
+```
+
+Uporabili smo $\chi^2$ test.
+
+$$\sum_{i=1}^n \frac{(o_i-e_i)^2}{e_i} \sim \chi^2((c-1)\times(r-1) )$$
+
+## Vizualizacija številskih spremenljivk
+
+Povezava višine in mase
+
+```{r}
+plot(visina, masa)
+plot(visina, masa, col = spol, pch=16,cex=1.5)
+```
+
+Ali na visino in maso vpliva barva las?
+ALi pa barva oci?
+
+```{r}
+plot(visina, masa, col = lasje, pch=16,cex=1.5,
+     main="lasje")
+plot(visina, masa, col = oci, pch=16,cex=1.5)
+title("Barvo določa: oci")
+```
+
+V dveh panelih
+
+```{r fig.height=10}
+par(mfrow=c(2,1),mar=c(4,4,2,1))
+plot(visina, masa, col = lasje, pch=16,cex=1.5,
+     main="lasje")
+plot(visina, masa, col = oci, pch=16,cex=1.5,bty="n")
+title("Barvo določa: oci")
+box("outer")  # nezaželeno :)
+```
+
+
+
+

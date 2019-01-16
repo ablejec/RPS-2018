@@ -1,0 +1,116 @@
+---
+title: "Vektorska aritmetika"
+author: "A Blejec"
+date: "16 oktober 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Vektorski račun
+
+R računa po komponentah:
+
+Zgradimo dva vektorja.
+
+CTRL-ALT-I je bližnjica za pripravo 'code chunk'
+Do simbola ` pridemo z AltGr-7
+
+```{r}
+z <- c(2,3,8)
+v <- c(9,8,7)
+z
+v
+```
+
+CTRL-Enter izvede en ukaz
+CTRL-SHIFT-Enter izvede vse ukaze v code chunk.
+
+Računanje
+
+```{r}
+z + 10
+z + v
+
+```
+
+```{r}
+z * 10
+z
+v
+z * v
+```
+
+Krajši vektor
+
+```{r}
+z
+z * c( -1,1)
+```
+
+Simbol za potenco: ^ je AltGr-3
+
+```{r}
+2^3
+2**3
+```
+
+Množenje matrik
+
+%*% je matrični produkt
+
+```{r}
+v
+z
+v * z
+v %*% z
+```
+
+To je bil skalarni produkt
+
+```{r}
+sum(v*z)
+```
+
+Transpozicija
+
+```{r}
+dim(v)
+t(v)
+t(t(v))   # grdo !!!
+```
+
+Vektorjem lahko dodamo dimenzijo
+
+```{r}
+V <- v
+V
+dim(V) <- c(3,1)
+V
+```
+
+```{r}
+Z <- z
+dim(Z) <- c(1,3)
+Z
+```
+
+```{r}
+V %*% Z
+Z %*% V
+```
+
+Besedila
+
+```{r}
+paste("Skalarni produkt je",sum(v*z))
+```
+
+Skalarni produkt je `r sum(v*z)`.
+
+V besedilu je rezultat izračuna.
+
+
+-------------

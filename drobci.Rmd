@@ -1,0 +1,62 @@
+---
+title: "Drobci"
+author: "A. Blejec"
+date: "09 januar 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,fig.width=10,fig.height=10)
+par(mar=c(4,4,2,1))
+```
+
+## Velikosti panelov v slikah
+
+```{r}
+par(mfrow=c(2,2))
+m <- prod(par("mfrow"))
+for(i in 1:m){
+plot(1:10,main=i)
+box("fig",col=i)
+}
+```
+
+## Funkcija `approx`
+
+## Funkcija `optim`
+
+
+```{r}
+sumsq <- function(par,x,y
+                  ){
+  a <- par[1]
+  b <- par[2]
+  yhat <- a+b*x
+  d2 <- sum((y-yhat)^2)
+  return(d2)
+}
+```
+
+
+Podatki
+```{r}
+n <- 10
+a <- 1
+b <- 3
+serr <- 1
+x <- rnorm(n)
+eps <- rnorm(n,sd = serr)
+y <- a + b * x + eps
+plot(x,y)
+X <- x
+Y <- y
+rm(x)
+```
+
+Optimizacija
+
+```{r}
+optim(par=c(0,1),sumsq,x=X,y=Y)
+lm(y~X)
+```
+
