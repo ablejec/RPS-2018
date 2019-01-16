@@ -36,7 +36,7 @@ hist(u)
 rug(u)
 ```
 
-EMpirična porazdelitvena funkcija
+Empirična porazdelitvena funkcija
 
 ```{r}
 P <- (rank(u)-0.5)/n
@@ -44,6 +44,9 @@ pD <- approxfun(u,P,yleft=min(u),yright=max(u))
 plot(u,pD(u),type="b")
 ```
 
+```{r}
+polt(u^2)
+```
 
 
 ## Funkcija `optim`
